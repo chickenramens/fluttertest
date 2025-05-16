@@ -5,15 +5,19 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
+import 'package:printing/printing.dart'; // 追加
+import 'package:pdf/pdf.dart'; // 追加
 
 class WebViewScreen extends StatefulWidget {
   final String url;
   final String title;
+  final bool printPdf;
 
   const WebViewScreen({
     Key? key,
     required this.url,
     this.title = 'WebView',
+    this.printPdf = false,
   }) : super(key: key);
 
   @override
@@ -36,7 +40,13 @@ class _WebViewScreenState extends State<WebViewScreen> {
         NavigationDelegate(
           onNavigationRequest: (NavigationRequest request) {
             if (request.url.endsWith('.pdf')) {
-              _downloadAndSavePdf(request.url);
+              if(this.widget.printPdf) {
+                // PDFファイルを印刷
+                _downloadAndPrintPdf(request.url);
+              } else {
+                // PDFファイルをダウンロードして保存
+                _downloadAndSavePdf(request.url);
+              }
               return NavigationDecision.prevent;
             }
             return NavigationDecision.navigate;
@@ -87,6 +97,45 @@ class _WebViewScreenState extends State<WebViewScreen> {
         ],
       ),
     );
+  }
+
+
+  Future<void> _downloadAndPrintPdf(String url) async {
+    try {
+      // PDFファイルをダウンロード
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        // ダウンロードディレクトリを取得
+        final directory = await getApplicationDocumentsDirectory();
+        final filePath = '${directory.path}/${url.split('/').last}';
+        final file = File(filePath);
+
+        // ファイルに保存
+        await file.writeAsBytes(response.bodyBytes);
+
+        // ユーザーに通知
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('PDFを保存しました: $filePath')),
+          );
+        }
+
+        // PDFを印刷
+        await Printing.layoutPdf(
+          onLayout: (PdfPageFormat format) async => response.bodyBytes,
+        );
+      } else {
+        throw Exception('PDFのダウンロードに失敗しました: ${response.statusCode}');
+      }
+    } catch (e) {
+      // エラーハンドリング
+      debugPrint('Error downloading PDF: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('エラーが発生しました: $e')),
+        );
+      }
+    }
   }
 
   Future<void> _downloadAndSavePdf(String url) async {
