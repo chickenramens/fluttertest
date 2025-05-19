@@ -11,13 +11,13 @@ import 'package:pdf/pdf.dart'; // 追加
 class WebViewScreen extends StatefulWidget {
   final String url;
   final String title;
-  final bool printPdf;
+  final int printPdf;
 
   const WebViewScreen({
     Key? key,
     required this.url,
     this.title = 'WebView',
-    this.printPdf = false,
+    this.printPdf = 0,
   }) : super(key: key);
 
   @override
@@ -40,7 +40,10 @@ class _WebViewScreenState extends State<WebViewScreen> {
         NavigationDelegate(
           onNavigationRequest: (NavigationRequest request) {
             if (request.url.endsWith('.pdf')) {
-              if(this.widget.printPdf) {
+              if(this.widget.printPdf == 0) {
+                // PDFファイルを印刷
+                return NavigationDecision.navigate;
+              } else if(this.widget.printPdf == 1) {
                 // PDFファイルを印刷
                 _downloadAndPrintPdf(request.url);
               } else {

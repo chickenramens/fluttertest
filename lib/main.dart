@@ -67,13 +67,13 @@ class RentalReceiptPage extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => const WebViewScreen(
                       url: 'https://toyota.jp/',
-                      title: 'Webviewサンプル',
-                      printPdf: false,
+                      title: 'Webviewサンプル(開く)',
+                      printPdf: 2,
                     ),
                   ),
                 );
               },
-              child: const Text('ウェブサイト表示'),
+              child: const Text('ウェブサイト表示(開く)'),
             ),
             const SizedBox(height: 20),
             // ウェブビュー画面へのナビゲーションボタンを追加
@@ -85,12 +85,29 @@ class RentalReceiptPage extends StatelessWidget {
                     builder: (context) => const WebViewScreen(
                       url: 'https://toyota.jp/',
                       title: 'Webviewサンプル(印刷)',
-                      printPdf: true,
+                      printPdf: 1,
                     ),
                   ),
                 );
               },
               child: const Text('ウェブサイト表示(印刷)'),
+            ),
+            const SizedBox(height: 20),
+            // ウェブビュー画面へのナビゲーションボタンを追加
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const WebViewScreen(
+                      url: 'https://toyota.jp/',
+                      title: 'Webviewサンプル(そのまま)',
+                      printPdf: 0,
+                    ),
+                  ),
+                );
+              },
+              child: const Text('ウェブサイト表示(そのまま)'),
             ),
           ],
         ),
