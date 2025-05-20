@@ -43,6 +43,7 @@ dependencies:
   http: ^1.4.0
   path_provider: ^2.1.5
   open_file: ^3.5.10
+  file_picker: ^10.1.9
 
 dev_dependencies:
   flutter_test:

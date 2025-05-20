@@ -109,6 +109,23 @@ class RentalReceiptPage extends StatelessWidget {
               },
               child: const Text('ウェブサイト表示(そのまま)'),
             ),
+            const SizedBox(height: 20),
+            // ウェブビュー画面へのナビゲーションボタンを追加
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const WebViewScreen(
+                      url: 'https://toyota.jp/',
+                      title: 'Webviewサンプル(選んで保存)',
+                      printPdf: 3,
+                    ),
+                  ),
+                );
+              },
+              child: const Text('ウェブサイト表示(選んで保存)'),
+            ),
           ],
         ),
       ),

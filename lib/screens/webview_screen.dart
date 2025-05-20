@@ -7,6 +7,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:printing/printing.dart'; // 追加
 import 'package:pdf/pdf.dart'; // 追加
+import 'package:file_picker/file_picker.dart'; // 追加
+
 
 class WebViewScreen extends StatefulWidget {
   final String url;
@@ -46,9 +48,14 @@ class _WebViewScreenState extends State<WebViewScreen> {
               } else if(this.widget.printPdf == 1) {
                 // PDFファイルを印刷
                 _downloadAndPrintPdf(request.url);
-              } else {
+              } else if(this.widget.printPdf == 2) {
                 // PDFファイルをダウンロードして保存
                 _downloadAndSavePdf(request.url);
+              } else if(this.widget.printPdf == 3) {
+                // PDFファイルをダウンロードして保存
+                _downloadAndSavePdf2(request.url);
+              } else {
+                return NavigationDecision.navigate;
               }
               return NavigationDecision.prevent;
             }
@@ -171,6 +178,43 @@ class _WebViewScreenState extends State<WebViewScreen> {
       }
     } catch (e) {
       // エラーハンドリング
+      debugPrint('Error downloading PDF: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('エラーが発生しました: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _downloadAndSavePdf2(String url) async {
+    try {
+      // PDFファイルをダウンロード
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        // ユーザーに保存場所を選ばせる
+        String? savePath = await FilePicker.platform.saveFile(
+          dialogTitle: 'PDFの保存先を選択してください',
+          fileName: url.split('/').last,
+          type: FileType.custom,
+          allowedExtensions: ['pdf'],
+          bytes: response.bodyBytes,
+        );
+  
+        if (savePath == null) {
+          // ユーザーがキャンセル
+          return;
+        }
+
+        final result = await OpenFile.open(savePath);
+        if (result.type != ResultType.done) {
+          throw Exception('PDFを開くことができませんでした: ${result.message}');
+        }
+  
+      } else {
+        throw Exception('PDFのダウンロードに失敗しました: ${response.statusCode}');
+      }
+    } catch (e) {
       debugPrint('Error downloading PDF: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
