@@ -7,6 +7,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'screens/webview_screen.dart'; // 追加: WebViewScreen のインポート
+import 'package:url_launcher/url_launcher.dart' as urlLauncher;
 
 void main() {
   runApp(const MyApp());
@@ -125,6 +126,33 @@ class RentalReceiptPage extends StatelessWidget {
                 );
               },
               child: const Text('ウェブサイト表示(選んで保存)'),
+            ),
+            const SizedBox(height: 20),
+            // ウェブビュー画面へのナビゲーションボタンを追加
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const WebViewScreen(
+                      url: 'https://mozilla.github.io/pdf.js/web/viewer.html',
+                      title: 'Webviewサンプル(そのまま pdf.js)',
+                      printPdf: 0,
+                    ),
+                  ),
+                );
+              },
+              child: const Text('ウェブサイト表示(そのまま pdf.js)'),
+            ),
+            const SizedBox(height: 20),
+            // ウェブビュー画面へのナビゲーションボタンを追加
+            ElevatedButton(
+              onPressed: () {
+                urlLauncher.launchUrl(
+                  Uri.parse('https://toyota.jp/')
+                );
+              },
+              child: const Text('in app browser'),
             ),
           ],
         ),
